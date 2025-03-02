@@ -2,7 +2,11 @@ package com.AntiSolo.AntiSolo.Entity;
 
 import com.mongodb.lang.NonNull;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "user")
 public class User {
@@ -16,11 +20,19 @@ public class User {
     @NonNull
     private String email;
 
+    @DBRef(lazy = true)
+    private List<Project> projects;
+
+
+    public void addproject(Project p){
+        projects.add(p);
+    }
 
     public User(String userName, @NonNull String password, @NonNull String email) {
         this.userName = userName;
         this.password = password;
         this.email = email;
+        this.projects = new ArrayList<>();
     }
 
     public String getUserName() {

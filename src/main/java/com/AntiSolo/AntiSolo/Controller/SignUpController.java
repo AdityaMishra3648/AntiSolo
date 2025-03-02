@@ -20,14 +20,15 @@ public class SignUpController {
 
     @PostMapping("/saveUser/{otp}")
     public String saveUser(@PathVariable String otp, @RequestBody User user){
-        System.out.println("opt = "+otp+" user = "+user+" inside controller");
+        System.out.println("opt = "+otp+" user = "+user+" inside controller "+otp);
         return userService.saveEntry(user,otp);
     }
 
     @PostMapping("/sendOTP")
-    public void sendOTP(@RequestBody OTP otp){
+    public String sendOTP(@RequestBody OTP otp){
         System.out.println("opt = "+otp.getId()+" inside controller");
-        emailService.sendMail(otp.getId());
+        if(emailService.sendMail(otp.getId())==0)return "failure";
+        return "success";
     }
 
 }

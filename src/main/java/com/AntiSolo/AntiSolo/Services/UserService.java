@@ -50,7 +50,15 @@ public class UserService {
             return false; // Indicates the ID was not found
         }
     }
-
+    public String checkUser(User user){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        Optional<User> curr = getById(user.getUserName());
+        if(!curr.isPresent())return "Incorrect UserName!";
+        String stored = curr.get().getPassword();
+        String camePassword = user.getPassword();
+        if(!encoder.matches(camePassword,stored))return "Incorrect Password!";
+        return "Login Success";
+    }
     public Optional<User> getByEmail(String email){
         return ur.findByEmail(email);
     }
