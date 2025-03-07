@@ -23,9 +23,46 @@ public class User {
     @DBRef(lazy = true)
     private List<Project> projects;
 
+    @DBRef(lazy = true)
+    private List<Project> applied;
+
+    @DBRef(lazy = true)
+    private List<Project> teams;
+
+    public void addTeamProject(Project p){
+        teams.add(p);
+    }
+    public void addAppliedProject(Project p){
+        applied.add(p);
+    }
+
 
     public void addproject(Project p){
         projects.add(p);
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
+    public List<Project> getApplied() {
+        return applied;
+    }
+
+    public void setApplied(List<Project> applied) {
+        this.applied = applied;
+    }
+
+    public List<Project> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Project> teams) {
+        this.teams = teams;
     }
 
     public User(String userName, @NonNull String password, @NonNull String email) {
@@ -33,6 +70,8 @@ public class User {
         this.password = password;
         this.email = email;
         this.projects = new ArrayList<>();
+        this.applied = new ArrayList<>();
+        this.teams = new ArrayList<>();
     }
 
     public String getUserName() {

@@ -1,6 +1,7 @@
 package com.AntiSolo.AntiSolo.Controller;
 
 
+import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.OTP;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Services.EmailService;
@@ -17,6 +18,7 @@ public class SignUpController {
 
     @Autowired
     public UserService userService;
+
 
     @PostMapping("/saveUser/{otp}")
     public String saveUser(@PathVariable String otp, @RequestBody User user){
