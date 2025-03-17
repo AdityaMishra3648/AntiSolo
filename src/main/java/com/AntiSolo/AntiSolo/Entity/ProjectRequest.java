@@ -98,8 +98,11 @@ public class ProjectRequest {
         this.members = members;
     }
 
-    public ProjectRequest(int teamSize, int filled, String domain,List<String> tags,String image,String title,String description,
-                          List<String> technologies,List<String> applicants,List<String> members) {
+    public ProjectRequest() {
+    }
+
+    public ProjectRequest(int teamSize, int filled, String domain, List<String> tags, String image, String title, String description,
+                          List<String> technologies, List<String> applicants, List<String> members) {
         this.teamSize = teamSize;
         this.filled = filled;
         this.domain = domain;
@@ -151,4 +154,21 @@ public class ProjectRequest {
     public void setAuthor(String author) {
         this.author = author;
     }
+
+    public ProjectRequest(int teamSize, int filled, List<String> tags, String domain, String image, String author, String title, String description, List<String> technologies, Date createdAt, String status, List<String> applicants, List<String> members) {
+        this.teamSize = teamSize;
+        this.filled = filled;
+        this.tags = tags;
+        this.domain = domain;
+        this.image = image;
+        this.author = author;
+        this.title = title;
+        this.description = description;
+        this.technologies = technologies;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.applicants = applicants;
+        this.members = members;
+    }
+
 }

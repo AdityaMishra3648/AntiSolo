@@ -40,7 +40,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(csrf->csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth->
-                        auth.requestMatchers("/signUp","/signUp/**","/login","/login/**").permitAll()
+                        auth.requestMatchers("/signUp","/signUp/**","/login","/login/**","/project/getProject/**","/project/getProject"
+                                ,"/project/randomPaginated","/project/randomPaginated/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntry))

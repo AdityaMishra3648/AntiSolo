@@ -13,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/login")
 @CrossOrigin
@@ -29,15 +31,22 @@ public class LogInController {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    @GetMapping("/userInfo/{username}")
+    public ResponseEntity<User> getUserInfo(@PathVariable String username){
+        Optional<User> user = userService.getById(username);
+        if(user.isPresent())return new ResponseEntity<>(user.get(),HttpStatus.OK);
+        return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+    }
+
     @PostMapping
-    public String login(@RequestBody User user){
+    public ResponseEntity<String> login(@RequestBody User user){
 
         this.doAuthenticate(user.getUserName(),user.getPassword());
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
         String token = this.jwtHelper.generateToken(userDetails);
 //        return userService.checkUser(user);
-        return token;
+        return new ResponseEntity<>(token,HttpStatus.OK);
     }
     @GetMapping("/checkToken/{token}")
     public boolean check(@PathVariable String token){

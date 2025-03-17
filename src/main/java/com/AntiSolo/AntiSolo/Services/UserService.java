@@ -1,6 +1,7 @@
 package com.AntiSolo.AntiSolo.Services;
 
 
+import com.AntiSolo.AntiSolo.Entity.Member;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
 import org.bson.types.ObjectId;
@@ -20,6 +21,9 @@ public class UserService {
     public OTPService otpService;
 
     public  static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public void saveDirect(User user){
+        ur.save(user);
+    }
     public String saveEntry(User user,String otp){
 //        je.setPassword(passwordEncoder.encode(je.getPassword()));
 //        ur.save(je);
@@ -62,4 +66,37 @@ public class UserService {
     public Optional<User> getByEmail(String email){
         return ur.findByEmail(email);
     }
+
+    public boolean sendFriendRequest(User sender,User user){
+        for(Member friend:user.getBuddies()){
+            if(friend.getName().equals(sender.getUserName()) )return false;
+        }
+       for(Member friend:sender.getBuddies()){
+            if(friend.getName().equals(user.getUserName()) )return false;
+       }
+
+       boolean widrawFriendRequest = user.getFriendRequest().removeIf(request->request.getName().equals(sender.getUserName()));
+       if(widrawFriendRequest){
+           saveDirect(user);
+           return true;
+       }
+       boolean RequesterAlreadyHasRequest = false;
+        for(Member request:sender.getFriendRequest()){
+            if(request.getName().equals(user.getUserName())){
+                RequesterAlreadyHasRequest = true;
+            }
+        }
+        if(RequesterAlreadyHasRequest){
+            sender.getFriendRequest().removeIf(request->request.getName().equals(user.getUserName()));
+            sender.addBuddies(new Member(user.getUserName(),user.getProfileImageUrl()));
+            user.addBuddies(new Member(sender.getUserName(),sender.getProfileImageUrl()));
+            saveDirect(sender);
+            saveDirect(user);
+            return false;
+        }
+        user.addFriendRequest(new Member(sender.getUserName(),sender.getProfileImageUrl()));
+        saveDirect(user);
+        return true;
+    }
+
 }

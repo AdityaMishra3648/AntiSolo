@@ -1,21 +1,35 @@
 package com.AntiSolo.AntiSolo.Entity;
 
+import com.AntiSolo.AntiSolo.Configuration.ObjectIdDeserializer;
+import com.AntiSolo.AntiSolo.Configuration.ObjectIdSerializer;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
+
+@Getter
+@Setter
 @Document(collection = "project")
 public class Project {
 
     @Id
+    @JsonSerialize(using = ObjectIdSerializer.class) // Convert ObjectId -> String
+    @JsonDeserialize(using = ObjectIdDeserializer.class) // Convert String -> ObjectId
     private ObjectId id;
 
 
@@ -26,8 +40,9 @@ public class Project {
 
     private String domain;
     private Set<String> tags;
-    @DBRef(lazy = true)
-    private User author;
+
+    private String author;
+    private String authorImage;
 
     private String image;
     private String title;
@@ -36,20 +51,26 @@ public class Project {
     private Date createdAt;
     private String status;
 
-    @DBRef(lazy = true)
-    private List<User> applicants;
+    private List<Member> applicants;
 
-    @DBRef(lazy = true)
-    private List<User> members;
 
-    public List<User> getMembers() {
+    private List<Member> members;
+
+    public void addMember(Member applicant){
+        members.add(applicant);
+    }
+
+    public void addApplicant(Member applicant){
+        applicants.add(applicant);
+    }
+
+    public List<Member> getMembers() {
         return members;
     }
 
-    public void setMemebers(List<User> memebers) {
-        this.members = memebers;
+    public void setAuthorImage(String authorImage){
+        this.authorImage = authorImage;
     }
-
 
     public String getImage() {
         return image;
@@ -73,6 +94,39 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    public Project() {
+    }
+
+    @PersistenceConstructor
+    public Project(ObjectId id, int teamSize, int filled, String domain, Set<String> tags, String author, String authorImage, String image, String title, String description, List<String> technologies, Date createdAt, String status, List<Member> applicants, List<Member> members) {
+        this.id = id;
+        this.teamSize = teamSize;
+        this.filled = filled;
+        this.domain = domain;
+        this.tags = tags;
+        this.author = author;
+        this.authorImage = authorImage;
+        this.image = image;
+        this.title = title;
+        this.description = description;
+        this.technologies = technologies;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.applicants = applicants;
+        this.members = members;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
+    public String getAuthorImage() {
+        return authorImage;
+    }
+
+    public void setMembers(List<Member> members) {
+        this.members = members;
     }
 
     public List<String> getTechnologies() {
@@ -99,18 +153,18 @@ public class Project {
         this.status = status;
     }
 
-    public List<User> getApplicants() {
+    public List<Member> getApplicants() {
         return applicants;
     }
 
-    public void setApplicants(List<User> applicants) {
+    public void setApplicants(List<Member> applicants) {
         this.applicants = applicants;
     }
 
 
 
-    public Project(User author, int teamSize, int filled,String domain, HashSet<String> tags,String image,String title,
-                   String description ,List<String> technologies, List<User> members) {
+    public Project(String author, int teamSize, int filled,String domain, HashSet<String> tags,String image,String title,
+                   String description ,List<String> technologies, List<Member> members) {
         this.author = author;
         this.teamSize = teamSize;
         this.filled = filled;
@@ -122,6 +176,8 @@ public class Project {
         this.technologies = technologies;
         this.applicants = new ArrayList<>();
         this.members = members;
+        this.createdAt = new Date();
+        this.status = "Recruiting";
     }
 
     public ObjectId getId() {
@@ -164,11 +220,12 @@ public class Project {
         this.tags = tags;
     }
 
-    public User getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
+
 }

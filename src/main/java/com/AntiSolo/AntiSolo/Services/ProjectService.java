@@ -1,14 +1,18 @@
 package com.AntiSolo.AntiSolo.Services;
 
+import com.AntiSolo.AntiSolo.Entity.Member;
 import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.Entity.ProjectRequest;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Repository.ProjectRepo;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
+import org.apache.commons.lang3.tuple.Pair;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 @Service
@@ -125,6 +129,10 @@ public class ProjectService {
             "Webpack", "Babel", "ESLint", "Prettier", "Gulp", "Grunt", "Three.js", "D3.js"
     ));
 
+    public void saveDirect(Project project){
+        projectRepo.save(project);
+    }
+
     public String save(ProjectRequest projectRequest){
         Optional<User> user = userService.getById(projectRequest.getAuthor());
         if(!user.isPresent())return "Invalid Request!";
@@ -140,21 +148,78 @@ public class ProjectService {
         for(String s:projectRequest.getTechnologies()){
             if(!TECHNOLOGIES.contains(s))return "Technology "+s+" does not exists!";
         }
-        List<User> members = new ArrayList<>();
-        members.add(user.get());
+        List<Member> members = new ArrayList<>();
+        members.add(new Member(user.get().getUserName(),user.get().getProfileImageUrl()));
 //        members.add()
         //settting project image from hashmap
         projectRequest.setImage(projectDomainImages.get(projectRequest.getDomain()));
-        Project p = new Project(user.get(),projectRequest.getTeamSize(),projectRequest.getFilled(),projectRequest.getDomain(),tags,
+        Project p = new Project(user.get().getUserName(),projectRequest.getTeamSize(),projectRequest.getFilled(),projectRequest.getDomain(),tags,
                 projectRequest.getImage(),projectRequest.getTitle(),projectRequest.getDescription(),projectRequest.getTechnologies(),members);
+        p.setAuthorImage(user.get().getProfileImageUrl());
         System.out.println("could not save project p = "+p);
         projectRepo.save(p);
-        user.get().addproject(p);
-        user.get().addTeamProject(p);
+        user.get().addproject(p.getId());
+        user.get().addTeamProject(p.getId());
         ur.save(user.get());
 
                         //after saving the user also reload the entire page so that it again fetches the
         //user details and the array with this project added is also added to list
         return "Saved successfully";
     }
+    public Optional<Project> getProjectById(ObjectId projectid){
+        return projectRepo.findById(projectid);
+    }
+
+    public List<Project> getRandomProjects(List<ObjectId> excludedIds, int limit) {
+        return projectRepo.findRandomProjectsExcluding(excludedIds, limit);
+    }
+
+
+
+
+    public boolean ApplyToggle(String username,Project project){
+        Optional<User> user = ur.findById(username);
+        if(user.isEmpty())return false;
+        ObjectId projectId = project.getId();
+        for(ObjectId id:user.get().getTeams()){
+            if(id.equals(projectId))return false;
+        }
+        Iterator<ObjectId> iterator = user.get().getApplied().iterator();
+        boolean applied = false;
+        while (iterator.hasNext()) {
+            if (iterator.next().equals(projectId)) {
+                iterator.remove();
+                applied = true;
+                break;
+            }
+        }
+        if(applied){
+
+            userService.saveDirect(user.get());
+            // Safely removes the element
+            project.getApplicants().removeIf(member -> member.getName().equals(username));
+            saveDirect(project);
+            return true;
+        }
+        user.get().addAppliedProject(projectId);
+        userService.saveDirect(user.get());
+        project.addApplicant(new Member(user.get().getUserName(),user.get().getProfileImageUrl()));
+        saveDirect(project);
+        return true;
+    }
+
+
+    public boolean acceptApplicant(Project project,User author,User applicant){
+        //I have extracted author data as well because we will have to push notification to author id in fiture
+        // Safely removes the element
+        project.getApplicants().removeIf(member -> member.getName().equals(applicant.getUserName()));
+        project.addMember(new Member(applicant.getUserName(),applicant.getProfileImageUrl()));
+        applicant.getApplied().removeIf(application->application.equals(project.getId()));
+        applicant.addTeamProject(project.getId());
+        project.setFilled(project.getFilled()+1);
+        saveDirect(project);
+        userService.saveDirect(applicant);
+        return true;
+    }
+
 }

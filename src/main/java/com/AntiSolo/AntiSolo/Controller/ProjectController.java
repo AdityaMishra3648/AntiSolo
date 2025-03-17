@@ -5,10 +5,20 @@ import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.Entity.ProjectRequest;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
+import com.AntiSolo.AntiSolo.Services.UserService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.swing.text.html.Option;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/project")
@@ -17,6 +27,9 @@ public class ProjectController {
     @Autowired
     public ProjectService projectService;
 
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     public JwtHelper jwtHelper;
@@ -35,7 +48,7 @@ public class ProjectController {
 //        projectRequest.setAuthor(jwtHelper.getUsernameFromToken(projectRequest.getAuthor()));
 //        if(!loggedInUser.equals(projectRequest.getAuthor()))return "Invalid Request";
         // Remove "Bearer " prefix if present
-        System.out.println("arrived in post");
+//        System.out.println("arrived in post");
         token = token.startsWith("Bearer ") ? token.substring(7) : token;
         projectRequest.setFilled(1);
         String username = jwtHelper.getUsernameFromToken(token);
@@ -44,4 +57,65 @@ public class ProjectController {
         return projectService.save(projectRequest);
 //        return "working on the API";
     }
+    @GetMapping("/getProject/{projectId}")
+    public ResponseEntity<Project> getProject(@PathVariable ObjectId projectId){
+        System.out.println("fetching project with id = "+projectId);
+        Optional<Project> project = projectService.getProjectById(projectId);
+        if(project.isPresent())return new ResponseEntity<>(project.get(), HttpStatus.OK);
+        else return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+    }
+
+    // Fetch random projects while excluding already fetched ones
+    @CrossOrigin(origins = "http://localhost:5174")
+    @GetMapping("/randomPaginated")
+    public ResponseEntity<List<Project>> getRandomProjects(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) List<String> excludeIds) {
+        System.out.println("random projects called");
+        // Convert String ID list to ObjectId list
+        List<ObjectId> excludedObjectIds = (excludeIds != null) ?
+                excludeIds.stream().map(ObjectId::new).collect(Collectors.toList())
+                : new ArrayList<>();
+
+        List<Project> projects = projectService.getRandomProjects(excludedObjectIds, limit);
+        return ResponseEntity.ok(projects);
+    }
+
+    @PostMapping("/ApplyToggleInProject/{projectId}")
+    public ResponseEntity<Boolean> ApplyToggle(@PathVariable ObjectId projectId,@RequestHeader("Authorization") String token){
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = jwtHelper.getUsernameFromToken(token);
+        Optional<Project> project = projectService.getProjectById(projectId);
+        if(project.isEmpty())return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+        boolean result = projectService.ApplyToggle(username,project.get());
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    @PostMapping("/AcceptApplicant")
+    public ResponseEntity<Boolean> AcceptApplicant(@RequestHeader("Authorization") String token,@RequestParam ObjectId projectId,
+                                                   @RequestParam String applicantUsername){
+        System.out.println("accept applicant called");
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = jwtHelper.getUsernameFromToken(token);
+        Optional<User> user = userService.getById(username);
+        Optional<User> applicant = userService.getById(applicantUsername);
+        Optional<Project> project = projectService.getProjectById(projectId);
+        System.out.println("empty checking project = "+project.isEmpty()+" user = "+user.isEmpty()+" applicant = "+applicant.isEmpty());
+        if(project.isEmpty() || user.isEmpty() || applicant.isEmpty())return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+        System.out.println("is author legit "+project.get().getAuthor().equals(username));
+        if(!project.get().getAuthor().equals(username))return new ResponseEntity<>(false,HttpStatus.UNAUTHORIZED);
+
+        boolean hasApplied = false;
+        for(ObjectId prId:applicant.get().getApplied()){
+            if(prId.equals(projectId)){
+                hasApplied = true;
+                break;
+            }
+        }
+        if(!hasApplied)return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+
+        boolean result = projectService.acceptApplicant(project.get(),user.get(),applicant.get());
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
 }
