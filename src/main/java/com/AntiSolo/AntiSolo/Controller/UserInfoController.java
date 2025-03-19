@@ -98,4 +98,16 @@ public class UserInfoController {
         boolean res = userService.sendFriendRequest(sender.get(),user.get());
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
+    @PostMapping("/confirmRequest/{username}")
+    public ResponseEntity<Boolean> acceptFriendRequest(@RequestHeader("Authorization") String token,@PathVariable String username){
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String senderName = jwtHelper.getUsernameFromToken(token);
+        Optional<User> sender = userService.getById(senderName);
+        if(sender.isEmpty() || username.equals(senderName))return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+        Optional<User> user = userService.getById(username);
+        if(user.isEmpty())return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+        boolean res = userService.acceptFriendRequest(sender.get(),user.get());
+        return new ResponseEntity<>(res,HttpStatus.OK);
+
+    }
 }

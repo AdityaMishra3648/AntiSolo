@@ -26,6 +26,9 @@ public class ProjectService {
     @Autowired
     UserRepo ur;
 
+    @Autowired
+    NotificationService notificationService;
+
     public static final Set<String> projectDomains = Set.of(
             "Web Development", "Mobile App Development", "Frontend Development",
             "Backend Development", "Full Stack Development", "Machine Learning",
@@ -205,6 +208,7 @@ public class ProjectService {
         userService.saveDirect(user.get());
         project.addApplicant(new Member(user.get().getUserName(),user.get().getProfileImageUrl()));
         saveDirect(project);
+        notificationService.newApplicationforProjectNotification(user.get().getUserName(),project.getAuthor(),project.getTitle(),projectId);
         return true;
     }
 
@@ -219,6 +223,7 @@ public class ProjectService {
         project.setFilled(project.getFilled()+1);
         saveDirect(project);
         userService.saveDirect(applicant);
+        notificationService.newApplicationforProjectNotification(applicant.getUserName(),project.getAuthor(),project.getTitle(),project.getId());
         return true;
     }
 

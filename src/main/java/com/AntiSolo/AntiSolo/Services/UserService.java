@@ -2,6 +2,7 @@ package com.AntiSolo.AntiSolo.Services;
 
 
 import com.AntiSolo.AntiSolo.Entity.Member;
+import com.AntiSolo.AntiSolo.Entity.Notification;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
 import org.bson.types.ObjectId;
@@ -19,6 +20,8 @@ public class UserService {
     UserRepo ur;
     @Autowired
     public OTPService otpService;
+    @Autowired
+    NotificationService notificationService;
 
     public  static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     public void saveDirect(User user){
@@ -92,10 +95,32 @@ public class UserService {
             user.addBuddies(new Member(sender.getUserName(),sender.getProfileImageUrl()));
             saveDirect(sender);
             saveDirect(user);
+            notificationService.AcceptedRequestNotification(sender.getUserName(),user.getUserName());
             return false;
         }
         user.addFriendRequest(new Member(sender.getUserName(),sender.getProfileImageUrl()));
         saveDirect(user);
+        notificationService.friendRequestReceivedNotification(sender.getUserName(),user.getUserName());
+        return true;
+    }
+
+    public boolean acceptFriendRequest(User sender,User user){
+
+        for(Member friend:user.getBuddies()){
+            if(friend.getName().equals(sender.getUserName()) )return false;
+        }
+        for(Member friend:sender.getBuddies()){
+            if(friend.getName().equals(user.getUserName()) )return false;
+        }
+        boolean userSentRequestToSender = sender.getFriendRequest().removeIf(request->request.getName().equals(user.getUserName()));
+//        System.out.println("seder has request from user ? = "+userSentRequestToSender+" sender = "+sender.getUserName()+" user = "+user.getUserName());
+        if(!userSentRequestToSender)return false;
+//        sender.getFriendRequest().removeIf(request->request.getName().equals(user.getUserName()));
+        sender.addBuddies(new Member(user.getUserName(),user.getProfileImageUrl()));
+        user.addBuddies(new Member(sender.getUserName(),sender.getProfileImageUrl()));
+        saveDirect(sender);
+        saveDirect(user);
+        notificationService.AcceptedRequestNotification(sender.getUserName(),user.getUserName());
         return true;
     }
 

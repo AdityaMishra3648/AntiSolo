@@ -47,6 +47,7 @@ public class User {
     private List<Member> buddies;
     List<Member> friendRequest;
 
+
     private double averageRating;
     private int totalRaters;
     private Map<String, String> socialLinks;  // Social profiles (GitHub, LinkedIn, etc.)
