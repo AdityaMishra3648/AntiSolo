@@ -41,7 +41,8 @@ public class SecurityConfig {
         http.csrf(csrf->csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth->
                         auth.requestMatchers("/signUp","/signUp/**","/login","/login/**","/project/getProject/**","/project/getProject"
-                                ,"/project/randomPaginated","/project/randomPaginated/**").permitAll()
+                                ,"/project/randomPaginated","/project/randomPaginated/**","/chat","/chat/**","/api/messages/**"
+                                        ,"/project/RandomPagesWithTags/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntry))

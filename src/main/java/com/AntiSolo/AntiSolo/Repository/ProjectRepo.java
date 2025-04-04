@@ -13,4 +13,10 @@ public interface ProjectRepo extends MongoRepository<Project, ObjectId> {
             "{ $sample: { size: ?1 } }"
     })
     List<Project> findRandomProjectsExcluding(List<ObjectId> excludedIds, int limit);
+
+    @Aggregation(pipeline = {
+            "{ $match: { _id: { $nin: ?0 }, tags: { $in: ?1 } } }",
+            "{ $sample: { size: ?2 } }"
+    })
+    List<Project> findRandomProjectsExcludingWithTags(List<ObjectId> excludedIds, List<String> tags, int limit);
 }

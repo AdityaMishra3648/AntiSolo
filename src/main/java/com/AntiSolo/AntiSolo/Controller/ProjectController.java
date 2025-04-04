@@ -2,7 +2,7 @@ package com.AntiSolo.AntiSolo.Controller;
 
 import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.Project;
-import com.AntiSolo.AntiSolo.Entity.ProjectRequest;
+import com.AntiSolo.AntiSolo.HelperEntities.ProjectRequest;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
 import com.AntiSolo.AntiSolo.Services.UserService;
@@ -10,11 +10,8 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -78,6 +75,31 @@ public class ProjectController {
                 : new ArrayList<>();
 
         List<Project> projects = projectService.getRandomProjects(excludedObjectIds, limit);
+        return ResponseEntity.ok(projects);
+    }
+
+    // Fetch random projects while excluding already fetched ones with tags feature
+    @CrossOrigin(origins = "http://localhost:5174")
+    @GetMapping("/RandomPagesWithTags")
+    public ResponseEntity<List<Project>> getRandomProjectsExcludingTags(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) List<String> excludeIds,
+            @RequestParam(required = true) List<String> tags) {
+        System.out.println("random project exclude tags called with tags = ");
+        for(String s:tags)System.out.print(s+" ");
+        System.out.println();
+        for(String s:excludeIds)System.out.print(s+" ");
+        System.out.println();
+        // Convert String ID list to ObjectId list
+        List<ObjectId> excludedObjectIds = (excludeIds != null) ?
+                excludeIds.stream().map(ObjectId::new).collect(Collectors.toList())
+                : new ArrayList<>();
+//        List<ObjectId> chackTags = (tags != null) ?
+//                tags.stream().map(ObjectId::new).collect(Collectors.toList())
+//                : new ArrayList<>();
+
+
+        List<Project> projects = projectService.getRandomFilteredProjects(excludedObjectIds,tags,limit);
         return ResponseEntity.ok(projects);
     }
 

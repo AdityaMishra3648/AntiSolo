@@ -2,20 +2,15 @@ package com.AntiSolo.AntiSolo.Entity;
 
 import com.AntiSolo.AntiSolo.Configuration.ObjectIdDeserializer;
 import com.AntiSolo.AntiSolo.Configuration.ObjectIdSerializer;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.AntiSolo.AntiSolo.HelperEntities.Member;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mongodb.lang.NonNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;

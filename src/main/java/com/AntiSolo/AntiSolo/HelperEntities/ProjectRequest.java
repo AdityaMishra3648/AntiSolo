@@ -1,16 +1,10 @@
-package com.AntiSolo.AntiSolo.Entity;
+package com.AntiSolo.AntiSolo.HelperEntities;
 
 import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 @AllArgsConstructor

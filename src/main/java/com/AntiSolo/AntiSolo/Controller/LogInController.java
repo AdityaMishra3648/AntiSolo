@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -30,6 +31,15 @@ public class LogInController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+
+    @GetMapping("/searchUser/{username}")
+    public List<User> searchUsers(@PathVariable String username){
+        return userService.findUsersWithPrefix(username);
+//        List<User> users = userService.getById(username);
+//        if(user.isPresent())return new ResponseEntity<>(user.get(),HttpStatus.OK);
+//        return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+    }
 
     @GetMapping("/userInfo/{username}")
     public ResponseEntity<User> getUserInfo(@PathVariable String username){

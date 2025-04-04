@@ -1,18 +1,15 @@
 package com.AntiSolo.AntiSolo.Services;
 
-import com.AntiSolo.AntiSolo.Entity.Member;
+import com.AntiSolo.AntiSolo.HelperEntities.Member;
 import com.AntiSolo.AntiSolo.Entity.Project;
-import com.AntiSolo.AntiSolo.Entity.ProjectRequest;
+import com.AntiSolo.AntiSolo.HelperEntities.ProjectRequest;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Repository.ProjectRepo;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 @Service
@@ -225,6 +222,26 @@ public class ProjectService {
         userService.saveDirect(applicant);
         notificationService.newApplicationforProjectNotification(applicant.getUserName(),project.getAuthor(),project.getTitle(),project.getId());
         return true;
+    }
+
+    // Fetch random projects excluding some IDs and filtering by tags
+    public List<Project> getRandomFilteredProjects(List<ObjectId> excludedIds, List<String> tags, int limit) {
+        return projectRepo.findRandomProjectsExcludingWithTags(excludedIds, tags, limit);
+    }
+
+    public boolean checkMember(User user,String projectId){
+        ObjectId obj = new ObjectId(projectId);
+        for(ObjectId prj:user.getTeams()){
+//            System.out.println("prj = "+prj+" obj = "+obj);
+            if(prj.equals(obj))return true;
+        }
+        return false;
+//        Optional<Project> project = projectRepo.findById(new ObjectId(projectId));
+//        if(project.isEmpty())return false;
+//        for(Member member:project.get().getMembers()){
+//            if(member.getName().equals(user.getUserName()))return true;
+//        }
+//        return false;
     }
 
 }

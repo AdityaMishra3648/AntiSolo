@@ -1,4 +1,4 @@
-package com.AntiSolo.AntiSolo.Entity;
+package com.AntiSolo.AntiSolo.HelperEntities;
 public class Member {
     private String name;
     private String imageUrl;

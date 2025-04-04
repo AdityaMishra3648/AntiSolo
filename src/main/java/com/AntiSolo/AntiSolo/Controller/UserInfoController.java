@@ -2,14 +2,12 @@ package com.AntiSolo.AntiSolo.Controller;
 
 
 import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
-import com.AntiSolo.AntiSolo.Entity.Member;
 import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Services.CloudinaryImageService;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
 import com.AntiSolo.AntiSolo.Services.UserService;
 import org.bson.types.ObjectId;
-import org.eclipse.angus.mail.iap.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
