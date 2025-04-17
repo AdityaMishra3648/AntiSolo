@@ -4,6 +4,7 @@ import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.HelperEntities.ProjectRequest;
 import com.AntiSolo.AntiSolo.Entity.User;
+import com.AntiSolo.AntiSolo.HelperEntities.WarningEntity;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
 import com.AntiSolo.AntiSolo.Services.UserService;
 import org.bson.types.ObjectId;
@@ -30,6 +31,7 @@ public class ProjectController {
 
     @Autowired
     public JwtHelper jwtHelper;
+
 
 
     @PostMapping("/test")
@@ -140,4 +142,30 @@ public class ProjectController {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    @PostMapping("/reportProject")
+    public void ReportProject(@RequestBody WarningEntity warningEntity){
+        projectService.fileReport(warningEntity);
+    }
+
+    @PostMapping("/editProject")
+    public ResponseEntity<Boolean> editProject(@RequestHeader("Authorization") String token,@RequestBody Project editedProject){
+        System.out.println("arrived in edit project "+" with id = "+editedProject.getId());
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = jwtHelper.getUsernameFromToken(token);
+        boolean ans = projectService.editProject(editedProject,username);
+        if(ans)return new ResponseEntity<>(true,HttpStatus.OK);
+        return new ResponseEntity<>(false,HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping("/deleteProject/{id}")
+    public ResponseEntity<Boolean> deleteProject(@RequestHeader("Authorization") String token,@PathVariable String id){
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = jwtHelper.getUsernameFromToken(token);
+        ObjectId proejctId = new ObjectId(id);
+        Optional<Project> project = projectService.getProjectById(proejctId);
+        if(project.isEmpty())return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+        if(!project.get().getAuthor().equals(username))return new ResponseEntity<>(false,HttpStatus.UNAUTHORIZED);
+        projectService.deleteProject(id);
+        return new ResponseEntity<>(true,HttpStatus.OK);
+    }
 }

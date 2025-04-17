@@ -1,6 +1,7 @@
 package com.AntiSolo.AntiSolo.Entity;
 
 import com.AntiSolo.AntiSolo.HelperEntities.Member;
+import com.AntiSolo.AntiSolo.HelperEntities.RatingEntity;
 import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,13 +44,45 @@ public class User {
     private List<Member> buddies;
     List<Member> friendRequest;
 
-
+    private List<RatingEntity> raters;
     private double averageRating;
     private int totalRaters;
     private Map<String, String> socialLinks;  // Social profiles (GitHub, LinkedIn, etc.)
     private List<String> notifications;
     private List<String> skills;  // List of skills (Java, Python, React, etc.)
     private List<String> interests;  // Interests in project domains
+    private String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public User(String userName, @NonNull String password, @NonNull String email, List<ObjectId> projects, List<ObjectId> applied, List<ObjectId> teams, String profileImageUrl, Date accountCreationDate, String bio, List<Member> buddies, List<Member> friendRequest, List<RatingEntity> raters, double averageRating, int totalRaters, Map<String, String> socialLinks, List<String> notifications, List<String> skills, List<String> interests, String role) {
+        this.userName = userName;
+        this.password = password;
+        this.email = email;
+        this.projects = projects;
+        this.applied = applied;
+        this.teams = teams;
+        this.profileImageUrl = profileImageUrl;
+        this.accountCreationDate = accountCreationDate;
+        this.bio = bio;
+        this.buddies = buddies;
+        this.friendRequest = friendRequest;
+        this.raters = raters;
+        this.averageRating = averageRating;
+        this.totalRaters = totalRaters;
+        this.socialLinks = socialLinks;
+        this.notifications = notifications;
+        this.skills = skills;
+        this.interests = interests;
+        this.role = role;
+    }
+
     public String getProfileImageUrl(){
         return this.profileImageUrl;
     }
@@ -123,6 +156,63 @@ public class User {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public User(String userName, @NonNull String password, @NonNull String email, List<ObjectId> projects, List<ObjectId> applied, List<ObjectId> teams, String profileImageUrl, String bio, Date accountCreationDate, List<Member> buddies, List<Member> friendRequest, List<RatingEntity> raters, double averageRating, int totalRaters, Map<String, String> socialLinks, List<String> notifications, List<String> skills, List<String> interests) {
+        this.userName = userName;
+        this.password = password;
+        this.email = email;
+        this.projects = projects;
+        this.applied = applied;
+        this.teams = teams;
+        this.profileImageUrl = profileImageUrl;
+        this.bio = bio;
+        this.accountCreationDate = accountCreationDate;
+        this.buddies = buddies;
+        this.friendRequest = friendRequest;
+        this.raters = raters;
+        this.averageRating = averageRating;
+        this.totalRaters = totalRaters;
+        this.socialLinks = socialLinks;
+        this.notifications = notifications;
+        this.skills = skills;
+        this.interests = interests;
+    }
+    public void addRater(RatingEntity ratingEntity){
+        this.raters.add(ratingEntity);
+    }
+    public User() {
+        String[] images = new String[]{"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1GvJLSBZLa0E0rxh1prAXaV9zq5mnU7c6yv18NNkJSVY3BcGOhBJDSal5kKwW3nzZI88&usqp=CAU",
+                "https://www.redditstatic.com/avatars/avatar_default_02_C18D42.png",
+                "https://www.redditstatic.com/avatars/avatar_default_02_7E53C1.png",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcauUs8R0kv2QxC66jCMgDWM1P4OVSDK7KsQnsDPGewdmNzgN0huSYTCHzhqkAGNPxV3o&usqp=CAU",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsFoHGp5Yk3O13acR_yhwaT91sZQb_ayxfwf4SzHZ_YqKTIWe9Oh-gN-2XEo-CoWJhCko&usqp=CAU",
+                "https://www.redditstatic.com/avatars/avatar_default_01_A5A4A4.png"};
+        Random random = new Random();
+        int randomNumber = random.nextInt(6);
+        this.projects = new ArrayList<>();
+        this.applied = new ArrayList<>();
+        this.teams = new ArrayList<>();
+        this.profileImageUrl = images[randomNumber];
+        this.accountCreationDate = new Date();
+        this.bio = "";
+        this.buddies = new ArrayList<>();
+        this.averageRating = 0.0;
+        this.totalRaters = 0;
+        this.skills = new ArrayList<>();
+        this.interests = new ArrayList<>();
+        this.socialLinks = new HashMap<>();
+        this.notifications = new ArrayList<>();
+        this.friendRequest = new ArrayList<>();
+        this.raters = new ArrayList<>();
+    }
+
+    public List<RatingEntity> getRaters() {
+        return raters;
+    }
+
+    public void setRaters(List<RatingEntity> raters) {
+        this.raters = raters;
     }
 
     public String getBio() {
@@ -223,6 +313,7 @@ public class User {
         this.socialLinks = new HashMap<>();
         this.notifications = new ArrayList<>();
         this.friendRequest = new ArrayList<>();
+        this.raters = new ArrayList<>();
     }
 
     public String getUserName() {

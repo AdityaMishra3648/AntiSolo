@@ -4,10 +4,12 @@ import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.ChatMessage;
 import com.AntiSolo.AntiSolo.Entity.ProjectChatMessage;
 import com.AntiSolo.AntiSolo.Services.ChatService;
+import com.AntiSolo.AntiSolo.Services.GroupChatService;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Arrays;
 
@@ -18,10 +20,12 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final JwtHelper jwtHelper;
     private final ChatService chatService;  // Service for database operations (saving messages, checking friends)
-    ChatController(SimpMessagingTemplate messagingTemplate, JwtHelper jwtHelper, ChatService chatService){
+    private final GroupChatService groupChatService;  // Service for database operations (saving messages, checking friends)
+    ChatController(SimpMessagingTemplate messagingTemplate, JwtHelper jwtHelper, ChatService chatService,GroupChatService groupChatService){
         this.chatService = chatService;
         this.jwtHelper = jwtHelper;
         this.messagingTemplate = messagingTemplate;
+        this.groupChatService = groupChatService;
     }
     /**
      * Handles private messages sent from one user to another.
@@ -71,15 +75,15 @@ public class ChatController {
         if (!senderUsername.equals(message.getSender())) {
             throw new RuntimeException("Unauthorized sender!");
         }
+        groupChatService.saveMessage(message);
 //        chatService.saveMessage(message);
         // Deliver message to recipient's WebSocket subscription
 //        messagingTemplate.convertAndSendToUser(chatId, "/queue/private", message);
         System.out.println("sending message to "+message.getProjectId());
         messagingTemplate.convertAndSend("/group/" + message.getProjectId(), message);
-        System.out.println("sent message to "+message.getProjectId());
+//        System.out.println("sent message to "+message.getProjectId());
 
     }
-
 
 
 }

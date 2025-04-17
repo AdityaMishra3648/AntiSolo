@@ -17,8 +17,7 @@ import java.util.*;
 
 
 
-@Getter
-@Setter
+
 @Document(collection = "project")
 public class Project {
 
@@ -93,6 +92,7 @@ public class Project {
     public Project() {
     }
 
+
     @PersistenceConstructor
     public Project(ObjectId id, int teamSize, int filled, String domain, Set<String> tags, String author, String authorImage, String image, String title, String description, List<String> technologies, Date createdAt, String status, List<Member> applicants, List<Member> members) {
         this.id = id;
@@ -158,7 +158,7 @@ public class Project {
 
 
 
-    public Project(String author, int teamSize, int filled,String domain, HashSet<String> tags,String image,String title,
+    public Project(String author, int teamSize, int filled,String domain, Set<String> tags,String image,String title,
                    String description ,List<String> technologies, List<Member> members) {
         this.author = author;
         this.teamSize = teamSize;
@@ -211,9 +211,9 @@ public class Project {
         return tags;
     }
 
-    public void setTags(HashSet<String> tags) {
-        this.tags = tags;
-    }
+//    public void setTags(HashSet<String> tags) {
+//        this.tags = tags;
+//    }
 
     public String getAuthor() {
         return author;

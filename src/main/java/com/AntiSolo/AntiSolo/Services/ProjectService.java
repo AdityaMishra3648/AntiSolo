@@ -1,15 +1,19 @@
 package com.AntiSolo.AntiSolo.Services;
 
+import com.AntiSolo.AntiSolo.Entity.ReportEntity;
 import com.AntiSolo.AntiSolo.HelperEntities.Member;
 import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.HelperEntities.ProjectRequest;
 import com.AntiSolo.AntiSolo.Entity.User;
+import com.AntiSolo.AntiSolo.HelperEntities.WarningEntity;
 import com.AntiSolo.AntiSolo.Repository.ProjectRepo;
+import com.AntiSolo.AntiSolo.Repository.ReportRepo;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -25,6 +29,9 @@ public class ProjectService {
 
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    ReportRepo reportRepo;
 
     public static final Set<String> projectDomains = Set.of(
             "Web Development", "Mobile App Development", "Frontend Development",
@@ -139,6 +146,7 @@ public class ProjectService {
         if(projectRequest.getTeamSize()<=1)return "Team size can not be 0 or 1";
         if(projectRequest.getDomain()==null || projectRequest.getDomain().isEmpty())return "Select Valid Domain!";
         if(!projectDomains.contains(projectRequest.getDomain()))return "Invalid domain name!";
+        if(projectRequest.getTitle().trim().isEmpty())return "title can not be empty";
         projectRequest.setTeamSize(Math.max(projectRequest.getTeamSize(),2));
         HashSet<String> tags = new HashSet<>();
         for(String i:projectRequest.getTags()){
@@ -242,6 +250,148 @@ public class ProjectService {
 //            if(member.getName().equals(user.getUserName()))return true;
 //        }
 //        return false;
+    }
+
+    public void fileReport(WarningEntity warningEntity){
+        String projectId = warningEntity.getProjectId();
+
+        Optional<Project> p = getProjectById(new ObjectId(projectId));
+        if(p.isEmpty())throw new RuntimeException();;
+        Optional<User> user = userService.getById(p.get().getAuthor());
+        if(user.isEmpty())throw new RuntimeException();;
+        Optional<ReportEntity> temp = reportRepo.findByProjectId(projectId);
+        if(temp.isPresent())throw new RuntimeException();
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setProjectId(projectId);
+        reportEntity.setEmail(user.get().getEmail());
+        reportEntity.setType(0);
+        reportEntity.setUserName(user.get().getUserName());
+        reportEntity.setCreatedAt(Instant.now());
+        reportEntity.setMessage(warningEntity.getMessage());
+        reportEntity.setReportFrom(warningEntity.getReportFrom());
+        reportRepo.save(reportEntity);
+    }
+
+    public boolean editProject(Project editedProject,String sender){
+        System.out.println("...0");
+        System.out.println(editedProject);
+        Optional<Project> project = getProjectById(editedProject.getId());
+        if(!project.get().getAuthor().equals(sender))return false;
+//        Optional<User> user = userService.getById(editedProject.getAuthor());
+//        if(user.isEmpty()|| project.isEmpty() || !project.get().getAuthor().equals(sender))return false;
+        System.out.println("...1");
+        System.out.println("...2");
+        if(editedProject.getTeamSize()<=1)return false;
+//        if(editedProject.getDomain()==null || editedProject.getDomain().isEmpty())return false;
+//        if(!projectDomains.contains(editedProject.getDomain()))return false;
+        editedProject.setTeamSize(Math.max(editedProject.getTeamSize(),2));
+//        HashSet<String> tags = new HashSet<>();
+        System.out.println("...3");
+        for(String i:editedProject.getTags()){
+            if(!technologyTags.contains(i))return false;
+//            tags.add(i);
+        }
+        System.out.println("...4");
+        for(String s:editedProject.getTechnologies()){
+            if(!TECHNOLOGIES.contains(s))return false;
+        }
+
+        System.out.println("...5");
+        project.get().setStatus(editedProject.getStatus());
+        project.get().setTeamSize(editedProject.getTeamSize());
+        project.get().setDescription(editedProject.getDescription());
+        project.get().setTechnologies(editedProject.getTechnologies());
+        project.get().setTags(editedProject.getTags());
+
+        //update members' info too that they have been kicked out of the project!
+        for(Member member:project.get().getMembers()){
+            boolean removed = true;
+            for(Member m:editedProject.getMembers()){
+                if(m.getName().equals(member.getName()))removed = false;
+            }
+            if(removed){
+                Optional<User> toBeRemovedMember = userService.getById(member.getName());
+                if(toBeRemovedMember.isEmpty())continue;
+                toBeRemovedMember.get().getTeams().removeIf(id->id.equals(project.get().getId()));
+                userService.saveDirect(toBeRemovedMember.get());
+            }
+        }
+        //members ko update kar do jo accept ho gaye hai
+        for(Member member:editedProject.getMembers()){
+            boolean accept = true;
+            for(Member m:project.get().getMembers()){
+                if(m.getName().equals(member.getName()))accept = false;
+            }
+
+
+            Optional<User> author = userService.getById(project.get().getAuthor());
+            Optional<User> applicant = userService.getById(member.getName());
+            if(accept)acceptApplicant(project.get(),author.get(),applicant.get());
+        }
+        project.get().setMembers(editedProject.getMembers());
+        //un applicants ko bhi bata de ki vo reject ho rhe hain ya accept ho gaye so they ae no longer in applicants list
+        for(Member applicant:project.get().getApplicants()){
+            boolean removed = true;
+            for(Member m:editedProject.getApplicants()){
+                if(m.getName().equals(applicant.getName()))removed = false;
+            }
+            for(Member m:editedProject.getMembers()){
+                if(m.getName().equals(applicant.getName()))removed = true;
+            }
+            if(removed){
+                Optional<User> toBeRemovedMember = userService.getById(applicant.getName());
+                if(toBeRemovedMember.isEmpty())continue;
+//                System.out.println(" before removing "+project.get().getId()+" applicant = "+toBeRemovedMember.get().getUserName());
+//                for(ObjectId d:toBeRemovedMember.get().getProjects()){
+//                    System.out.println(d);
+//                }
+
+                toBeRemovedMember.get().getApplied().removeIf(id->id.equals(project.get().getId()));
+
+//                System.out.println("after removeing ");
+//                for(ObjectId d:toBeRemovedMember.get().getProjects()){
+//                    System.out.println(d);
+//                }
+                userService.saveDirect(toBeRemovedMember.get());
+            }
+        }
+        project.get().setApplicants(editedProject.getApplicants());
+        project.get().setFilled(project.get().getMembers().size());
+        project.get().getApplicants().removeIf(elem->project.get().getMembers().contains(elem));
+        saveDirect(project.get());
+        return true;
+    }
+
+    public void removeApplication(String userName,ObjectId projectId){
+        Optional<User> user = userService.getById(userName);
+        if(user.isEmpty())return;
+        user.get().getApplied().removeIf(id -> id.equals(projectId));
+        userService.saveDirect(user.get());
+    }
+
+
+    public void removeMember(String userName,ObjectId projectId){
+        Optional<User> user = userService.getById(userName);
+        if(user.isEmpty())return;
+        user.get().getTeams().removeIf(id -> id.equals(projectId));
+        user.get().getProjects().removeIf(id -> id.equals(projectId));
+        userService.saveDirect(user.get());
+    }
+
+
+    public void deleteProject(String id){
+        ObjectId projectId = new ObjectId(id);
+        Optional<Project> project = getProjectById(projectId);
+        if(project.isEmpty())return;
+        for(Member applicant:project.get().getApplicants()){
+            removeApplication(applicant.getName(),projectId);
+        }
+        for(Member member:project.get().getMembers()){
+            removeMember(member.getName(),projectId);
+        }
+        projectRepo.deleteById(projectId);
+
+
     }
 
 }

@@ -3,14 +3,18 @@ package com.AntiSolo.AntiSolo.Services;
 
 import com.AntiSolo.AntiSolo.HelperEntities.Member;
 import com.AntiSolo.AntiSolo.Entity.User;
+import com.AntiSolo.AntiSolo.HelperEntities.RatingEntity;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
@@ -41,8 +45,8 @@ public class UserService {
             if(ur.findByEmail(user.getEmail()).isPresent())return "User with this email already exists";
             if(ur.findById(user.getUserName()).isPresent())return "Username already taken";
 //            if(user.getUserName().contains())return "Username already taken";
-            if (user.getUserName().length() < 3 || user.getUserName().length() > 15) {
-                return "Username must be between 3 and 15 characters";
+            if (user.getUserName().length() < 3 || user.getUserName().length() > 25) {
+                return "Username must be between 3 and 25 characters";
             }
             if (user.getUserName().contains(" ")) {
                 return "Username cannot contain spaces";
@@ -60,7 +64,7 @@ public class UserService {
             if (user.getPassword().length()<4 || user.getPassword().length()>20) {
                 return "Password length must be between 4 to 20 letters";
             }
-
+            user.setRole("USER");
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User savedUser = ur.save(user);
 
@@ -152,5 +156,51 @@ public class UserService {
 
     public List<User> findUsersWithPrefix(String username){
         return ur.findByUserNamePrefix(username);
+    }
+
+    public void updateRating(String senderUserName,int rating,String targetUserName){
+        if(rating>10 || rating<0)return;
+        if(!shareAnyProject(senderUserName,targetUserName))return;
+        boolean flag = false;
+        Optional<User> sender = getById(senderUserName);
+        if(sender.isEmpty())return;
+        Optional<User> target = getById(targetUserName);
+        if(target.isEmpty())return;
+        int n = target.get().getRaters().size();
+        for(int i=0;i<n;i++){
+            RatingEntity r = target.get().getRaters().get(i);
+            if(r.getUserName().equals(senderUserName)){
+                r.setRating(rating);
+                flag = true;
+            }
+        }
+        if(!flag){
+            target.get().addRater(new RatingEntity(senderUserName,rating));
+            target.get().setTotalRaters(target.get().getTotalRaters()+1);
+        }
+        double totalRating = 0;
+        int m = target.get().getRaters().size();
+        for(RatingEntity r:target.get().getRaters())totalRating += (double)r.getRating();
+        target.get().setAverageRating(totalRating/(double)m );
+        saveDirect(target.get());
+    }
+
+    public boolean shareAnyProject(String user1,String user2){
+        Optional<User> u1 = getById(user1);
+        Optional<User> u2 = getById(user2);
+        if(user1.isEmpty() || user2.isEmpty())return false;
+        Set<ObjectId> st = new HashSet<>();
+        for(ObjectId s:u1.get().getTeams())st.add(s);
+        for(ObjectId s:u2.get().getTeams())if(st.contains(s))return true;
+        return false;
+    }
+    public void unfriend(String user1,String user2){
+        Optional<User> u1 = getById(user1);
+        Optional<User> u2 = getById(user2);
+        if(u1.isEmpty() || u2.isEmpty())return;
+        u1.get().getBuddies().removeIf(buddy->buddy.getName().equals(u2.get().getUserName()));
+        u2.get().getBuddies().removeIf(buddy->buddy.getName().equals(u1.get().getUserName()));
+        saveDirect(u1.get());
+        saveDirect(u2.get());
     }
 }

@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username){
         Optional<User> user = userService.getById(username);
         if(user.isPresent()){
-            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder().username(user.get().getUserName()).password(user.get().getPassword()).roles("USER").build();
+            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder().username(user.get().getUserName()).password(user.get().getPassword()).roles(user.get().getRole()).build();
             return userDetails;
         }
         throw new UsernameNotFoundException("User not found with username "+username);

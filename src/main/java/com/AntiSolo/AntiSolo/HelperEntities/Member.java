@@ -1,4 +1,8 @@
 package com.AntiSolo.AntiSolo.HelperEntities;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Member {
     private String name;
     private String imageUrl;

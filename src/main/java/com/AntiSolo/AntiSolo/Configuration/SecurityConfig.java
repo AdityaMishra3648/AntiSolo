@@ -40,7 +40,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(csrf->csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth->
-                        auth.requestMatchers("/signUp","/signUp/**","/login","/login/**","/project/getProject/**","/project/getProject"
+                        auth.requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/signUp","/signUp/**","/login","/login/**","/project/getProject/**","/project/getProject"
                                 ,"/project/randomPaginated","/project/randomPaginated/**","/chat","/chat/**","/api/messages/**"
                                         ,"/project/RandomPagesWithTags/**").permitAll()
                                 .anyRequest().authenticated()

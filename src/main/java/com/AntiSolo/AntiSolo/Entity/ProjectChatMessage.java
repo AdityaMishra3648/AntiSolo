@@ -16,6 +16,15 @@ public class ProjectChatMessage {
 
     @CreatedDate
     private Instant createdAt;
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public ProjectChatMessage() {
         this.createdAt = Instant.now();
     }

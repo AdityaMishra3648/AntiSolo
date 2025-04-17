@@ -4,6 +4,7 @@ package com.AntiSolo.AntiSolo.Controller;
 import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.Entity.User;
+import com.AntiSolo.AntiSolo.HelperEntities.RatingEntity;
 import com.AntiSolo.AntiSolo.Services.CloudinaryImageService;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
 import com.AntiSolo.AntiSolo.Services.UserService;
@@ -11,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -106,6 +108,24 @@ public class UserInfoController {
         if(user.isEmpty())return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
         boolean res = userService.acceptFriendRequest(sender.get(),user.get());
         return new ResponseEntity<>(res,HttpStatus.OK);
+    }
 
+
+    @PostMapping("/rate")
+    public void rate(@RequestHeader("Authorization") String token, @RequestBody RatingEntity ratingEntity){
+        //in this we have sent target username in ratingEntity I know its not correct way because it was place for the user who is
+        //rating and not for whoom the rating is being updated but I just didn't feel like making new helper entity so make it work
+        System.out.println("rate called with toek = "+token);
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String senderName = jwtHelper.getUsernameFromToken(token);
+//        Optional<User> sender = userService.getById(senderName);
+        if(ratingEntity.getUserName().equals(senderName))return;
+        userService.updateRating(senderName,ratingEntity.getRating(),ratingEntity.getUserName());
+    }
+    @PostMapping("/removeFriend/{friendUserName}")
+    public void removeFriend(@RequestHeader("Authorization") String token,@PathVariable String friendUserName){
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String senderName = jwtHelper.getUsernameFromToken(token);
+        userService.unfriend(senderName,friendUserName);
     }
 }

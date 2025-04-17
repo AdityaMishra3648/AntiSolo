@@ -1,7 +1,10 @@
 package com.AntiSolo.AntiSolo.Controller;
 
 import com.AntiSolo.AntiSolo.Entity.ChatMessage;
+import com.AntiSolo.AntiSolo.Entity.ProjectChatMessage;
 import com.AntiSolo.AntiSolo.Services.ChatService;
+import com.AntiSolo.AntiSolo.Services.GroupChatService;
+import com.AntiSolo.AntiSolo.Services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +18,8 @@ public class MessagesProviderController {
 
     @Autowired
     private ChatService chatService;
+    @Autowired
+    private GroupChatService groupChatService;
 
     public String generateChatId(String user1, String user2) {
         String[] users = {user1, user2};
@@ -28,7 +33,18 @@ public class MessagesProviderController {
             @PathVariable String chatId,
             @RequestParam(required = false) Instant cursorCreatedAt,
             @RequestParam(defaultValue = "10") int pageSize) {
-
+        //add here logic that the token that came here is of the user that is a friend of the current user only fetch the previous message
+        //not adding right now cause lack of time
         return chatService.getMessages(chatId, cursorCreatedAt, pageSize);
+    }
+
+    @GetMapping("/group/{projectId}")
+    public List<ProjectChatMessage> getGroupMessage(
+            @PathVariable String projectId,
+            @RequestParam(required = false) Instant cursorCreatedAt,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        //add here logic that the token that came here is of the user that is a part of the projectthen only fetch the previous message
+        //not adding right now cause lack of time
+        return groupChatService.getMessages(projectId, cursorCreatedAt, pageSize);
     }
 }

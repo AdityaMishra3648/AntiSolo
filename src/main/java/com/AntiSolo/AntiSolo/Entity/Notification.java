@@ -26,8 +26,15 @@ public class Notification {
     @CreatedDate
     private Instant createdAt;
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 
-    public Notification(int type,String message,String parent,String userName, ObjectId projectId) {
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Notification(int type, String message, String parent, String userName, ObjectId projectId) {
         this.type = type;
         this.parent = parent;
         this.message = message;
