@@ -16,6 +16,11 @@ public class AdminService {
     public void warnUser(String email,String userName,String projectTittle){
         emailService.sendWarningEmail(email,userName,projectTittle);
     }
+    public void warnUserForProfileReport(String email,String userName){
+        emailService.sendProfileWarningEmail(email,userName);
+    }
+
+
 
     public List<ReportEntity> getAllReports(){
 

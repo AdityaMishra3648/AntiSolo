@@ -60,8 +60,7 @@ public class ProjectController {
     public ResponseEntity<Project> getProject(@PathVariable ObjectId projectId){
         System.out.println("fetching project with id = "+projectId);
         Optional<Project> project = projectService.getProjectById(projectId);
-        if(project.isPresent())return new ResponseEntity<>(project.get(), HttpStatus.OK);
-        else return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        return project.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     // Fetch random projects while excluding already fetched ones

@@ -4,7 +4,10 @@ package com.AntiSolo.AntiSolo.Controller;
 import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.Project;
 import com.AntiSolo.AntiSolo.Entity.User;
+import com.AntiSolo.AntiSolo.HelperEntities.Member;
 import com.AntiSolo.AntiSolo.HelperEntities.RatingEntity;
+import com.AntiSolo.AntiSolo.HelperEntities.WarningEntity;
+import com.AntiSolo.AntiSolo.Repository.UserRepo;
 import com.AntiSolo.AntiSolo.Services.CloudinaryImageService;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
 import com.AntiSolo.AntiSolo.Services.UserService;
@@ -16,6 +19,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,6 +38,9 @@ public class UserInfoController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @PostMapping("/saveImage")
     public ResponseEntity<Map> saveImage(@RequestParam("image")MultipartFile file,@RequestHeader("Authorization") String token){
@@ -73,6 +80,28 @@ public class UserInfoController {
                 }
             }
             projectService.saveDirect(project.get());
+        }
+        for(Member buddy:user.get().getBuddies()){
+            Optional<User> buddyUser = userService.getById(buddy.getName());
+            if(!buddyUser.isPresent())continue;
+            for(int i=0;i<buddyUser.get().getBuddies().size();i++){
+                if(buddyUser.get().getBuddies().get(i).getName().equals(user.get().getUserName()) ){
+                    buddyUser.get().getBuddies().get(i).setImageUrl(imgUrl);
+                    break;
+                }
+            }
+            userService.saveDirect(buddyUser.get());
+        }
+
+        List<User> sentFriendRequests = userRepo.findAllByFriendRequestName(username);
+        for(User u:sentFriendRequests){
+            for(int i=0;i<u.getFriendRequest().size();i++){
+                if(u.getFriendRequest().get(i).getName().equals(username)){
+                    u.getFriendRequest().get(i).setImageUrl(imgUrl);
+                    break;
+                }
+            }
+            userService.saveDirect(u);
         }
 
         return new ResponseEntity<>(data, HttpStatus.OK);
@@ -128,4 +157,28 @@ public class UserInfoController {
         String senderName = jwtHelper.getUsernameFromToken(token);
         userService.unfriend(senderName,friendUserName);
     }
+
+    @PutMapping("/editUser")
+    public void editUser(@RequestHeader("Authorization") String token,@RequestBody User user){
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = jwtHelper.getUsernameFromToken(token);
+        if(!user.getUserName().equals(username))return;
+        userService.editProfile(user);
+    }
+
+    @GetMapping("/doTheyShareProject/{user1}")
+    public ResponseEntity<Boolean> commonProjectChecker(@RequestHeader("Authorization") String token,@PathVariable String user1){
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String user2 = jwtHelper.getUsernameFromToken(token);
+        boolean res = userService.shareAnyProject(user1,user2);
+//        System.out.println("checking two users user1 = "+user1+" user2 = "+user2+" gave res = "+res);
+        if(res)return new ResponseEntity<>(true,HttpStatus.OK);
+        return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/reportUser")
+    public void ReportProject(@RequestBody WarningEntity warningEntity){
+        userService.fileReport(warningEntity);
+    }
+
 }

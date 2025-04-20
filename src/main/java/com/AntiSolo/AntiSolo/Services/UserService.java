@@ -1,9 +1,13 @@
 package com.AntiSolo.AntiSolo.Services;
 
 
+import com.AntiSolo.AntiSolo.Entity.Project;
+import com.AntiSolo.AntiSolo.Entity.ReportEntity;
 import com.AntiSolo.AntiSolo.HelperEntities.Member;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.HelperEntities.RatingEntity;
+import com.AntiSolo.AntiSolo.HelperEntities.WarningEntity;
+import com.AntiSolo.AntiSolo.Repository.ReportRepo;
 import com.AntiSolo.AntiSolo.Repository.UserRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +30,10 @@ public class UserService {
     public OTPService otpService;
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    ReportRepo reportRepo;
+
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9._]{2,24}$");
     public  static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     public void saveDirect(User user){
@@ -32,27 +41,27 @@ public class UserService {
     }
 
 
-    public String saveEntry(User user,String otp){
+    public String saveEntry(User user,String otp,boolean initial){
 //        je.setPassword(passwordEncoder.encode(je.getPassword()));
 //        ur.save(je);
 
         System.out.println("inside UserService");
         try {
             if(!otpService.validateOTP(user.getEmail(),otp))return "Incorrect OTP";
-            if (user.getUserName() == null || user.getUserName().trim().isEmpty()) {
+            if (initial && (user.getUserName() == null || user.getUserName().trim().isEmpty()) ) {
                 return "Username cannot be empty";
             }
-            if(ur.findByEmail(user.getEmail()).isPresent())return "User with this email already exists";
-            if(ur.findById(user.getUserName()).isPresent())return "Username already taken";
+            if(initial && ur.findByEmail(user.getEmail()).isPresent())return "User with this email already exists";
+            if(initial && ur.findById(user.getUserName()).isPresent())return "Username already taken";
 //            if(user.getUserName().contains())return "Username already taken";
-            if (user.getUserName().length() < 3 || user.getUserName().length() > 25) {
+            if (initial && (user.getUserName().length() < 3 || user.getUserName().length() > 25) ) {
                 return "Username must be between 3 and 25 characters";
             }
-            if (user.getUserName().contains(" ")) {
+            if (initial && user.getUserName().contains(" ")) {
                 return "Username cannot contain spaces";
             }
 
-            if (!USERNAME_PATTERN.matcher(user.getUserName()).matches()) {
+            if (initial && !USERNAME_PATTERN.matcher(user.getUserName()).matches()) {
                 return "Username can only contain letters, digits, dot (.) or underscore (_) and must start with a letter";
             }
             if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
@@ -65,6 +74,16 @@ public class UserService {
                 return "Password length must be between 4 to 20 letters";
             }
             user.setRole("USER");
+
+
+            if(!initial){
+                Optional<User> dbUser = ur.findByEmail(user.getEmail());
+                if(dbUser.isEmpty())return "No user found with the given email!";
+                dbUser.get().setPassword(passwordEncoder.encode(user.getPassword()) );
+                ur.save(dbUser.get());
+                return dbUser.get().getUserName();
+            }
+
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User savedUser = ur.save(user);
 
@@ -80,12 +99,7 @@ public class UserService {
         return ur.findById(id);
     }
     public boolean deleteByid(String id){
-        if (ur.existsById(id)) {
-            ur.deleteById(id);
-            return true;  // Indicates deletion was successful
-        } else {
-            return false; // Indicates the ID was not found
-        }
+        return true;
     }
     public String checkUser(User user){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -203,4 +217,38 @@ public class UserService {
         saveDirect(u1.get());
         saveDirect(u2.get());
     }
+
+    public void editProfile(User edited){
+        Optional<User> user = getById(edited.getUserName());
+        if(user.isEmpty())return;
+        user.get().setBio(edited.getBio());
+        user.get().setSkills(edited.getSkills());
+        user.get().setInterests(edited.getInterests());
+        user.get().setSocialLinks(edited.getSocialLinks());
+        saveDirect(user.get());
+    }
+
+    public void fileReport(WarningEntity warningEntity){
+//        String projectId = warningEntity.getProjectId();
+
+//        Optional<User> p = getById(new ObjectId(projectId));
+//        if(p.isEmpty())throw new RuntimeException();;
+//        Optional<User> user = userService.getById(p.get().getAuthor());
+//        if(user.isEmpty())throw new RuntimeException();;
+//        Optional<ReportEntity> temp = reportRepo.findByProjectId(projectId);
+//        if(temp.isPresent())throw new RuntimeException();
+        Optional<User> guilty = getById(warningEntity.getReported());
+        if(guilty.isEmpty())throw new RuntimeException();
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setEmail(guilty.get().getEmail());
+        reportEntity.setType(1);
+        reportEntity.setUserName(guilty.get().getUserName());
+        reportEntity.setCreatedAt(Instant.now());
+        reportEntity.setMessage(warningEntity.getMessage());
+        reportEntity.setReportFrom(warningEntity.getReportFrom());
+        reportRepo.save(reportEntity);
+    }
+
+
+
 }

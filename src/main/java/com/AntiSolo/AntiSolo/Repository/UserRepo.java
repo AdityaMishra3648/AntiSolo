@@ -14,4 +14,8 @@ public interface UserRepo extends MongoRepository<User,String> {
     @Query("{ '_id': { $regex: ?0, $options: 'i' } }") // Case-insensitive prefix search
     List<User> findByUserNamePrefix(String prefix);
 
+    @Query("{ 'friendRequest.name': ?0 }")
+    List<User> findAllByFriendRequestName(String userName);
+
+
 }

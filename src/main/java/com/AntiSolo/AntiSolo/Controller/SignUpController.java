@@ -3,10 +3,13 @@ package com.AntiSolo.AntiSolo.Controller;
 
 import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.OTP;
+import com.AntiSolo.AntiSolo.Entity.ReportEntity;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Services.EmailService;
 import com.AntiSolo.AntiSolo.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +25,18 @@ public class SignUpController {
 
     @PostMapping("/saveUser/{otp}")
     public String saveUser(@PathVariable String otp, @RequestBody User user){
-        System.out.println("opt = "+otp+" user = "+user+" inside controller "+otp);
-        return userService.saveEntry(user,otp);
+//        System.out.println("opt = "+otp+" user = "+user+" inside controller "+otp);
+        return userService.saveEntry(user,otp,true);
+    }
+
+    @PostMapping("/editPassword/{otp}")
+    public ResponseEntity<String> editPassword(@PathVariable String otp,@RequestBody User user){
+        String res = userService.saveEntry(user,otp,false);
+        if(res.equals("Incorrect OTP") || res.equals("Password cannot be empty") || res.equals("Password cannot contain spaces")
+        || res.equals("Password length must be between 4 to 20 letters") || res.equals("No user found with the given email!")){
+            return new ResponseEntity<>(res,HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @PostMapping("/sendOTP")

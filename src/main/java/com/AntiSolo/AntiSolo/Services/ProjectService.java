@@ -45,33 +45,33 @@ public class ProjectService {
             "Autonomous Systems", "HealthTech", "FinTech", "EdTech", "Robotics"
     );
     public static final Map<String, String> projectDomainImages = Map.ofEntries(
-            Map.entry("Web Development", "https://cdn.prod.website-files.com/6344c9cef89d6f2270a38908/673f2a3b44c1ed4901bb43bb_6386328bea96dffacc89946b_d1.webp"),
-            Map.entry("Mobile App Development", "https://www.etatvasoft.com/blog/wp-content/uploads/2022/08/mobile-app-development-methodologies.jpg"),
-            Map.entry("Frontend Development", "https://media.geeksforgeeks.org/wp-content/uploads/20240703165023/Frontend-Development-(1).webp"),
-            Map.entry("Backend Development", "https://media.geeksforgeeks.org/wp-content/uploads/20240701150157/Backend-Development.webp"),
-            Map.entry("Full Stack Development", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9kSSgd9JhbQNXDv9kpXbHp6hzl3OiQ9zdJg&s"),
-            Map.entry("Machine Learning", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4sXvAhlZ68GDr_LA9ho4jhOz7-8Mzp7d-pQ&s"),
-            Map.entry("Artificial Intelligence", "https://www.vecteezy.com/vector-art/13899429-machine-learning-icon-artificial-intelligence-smart-machine-logo-template-vector-illustration"),
-            Map.entry("Data Science", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Cloud Computing", "https://www.dreamstime.com/stock-image-cloud-computing-text-cloud-image-image33947891"),
-            Map.entry("Cybersecurity", "https://www.pexels.com/search/web%20development%20with%20text/"),
-            Map.entry("Blockchain", "https://www.dreamstime.com/blockchain-text-abstract-background-connection-fiber-data-encrypted-metaverse-concept-image259671697"),
-            Map.entry("Internet of Things (IoT)", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Game Development", "https://www.pexels.com/search/web%20development%20with%20text/"),
-            Map.entry("Virtual Reality (VR) & Augmented Reality (AR)", "https://www.pexels.com/search/web%20development%20with%20text/"),
-            Map.entry("Embedded Systems", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("DevOps & Automation", "https://www.pexels.com/search/web%20development%20with%20text/"),
-            Map.entry("Big Data & Analytics", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Networking & Security", "https://www.pexels.com/search/web%20development%20with%20text/"),
-            Map.entry("Software Engineering & Development", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Database Management", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Computer Vision", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Natural Language Processing (NLP)", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Autonomous Systems", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("HealthTech", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("FinTech", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("EdTech", "https://www.pexels.com/search/website%20development%20text/"),
-            Map.entry("Robotics", "https://www.pexels.com/search/website%20development%20text/")
+            Map.entry("Web Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088295/673f2a3b44c1ed4901bb43bb_6386328bea96dffacc89946b_d1_tx1xwe.webp"),
+            Map.entry("Mobile App Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088357/mobile-app-development-methodologies_twls9y.jpg"),
+            Map.entry("Frontend Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088401/Frontend-Development-_1_qbykn6.webp"),
+            Map.entry("Backend Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088450/Backend-Development_z0xors.webp"),
+            Map.entry("Full Stack Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088489/images_gfgqs9.png"),
+            Map.entry("Machine Learning", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088534/images_urdx5m.jpg"),
+            Map.entry("Artificial Intelligence", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088681/artificial-technology-with-head-connection-line-logo-design_1042756-363_oxgcre.avif"),
+            Map.entry("Data Science", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088768/istockphoto-1487248005-640x640_g87rqu.jpg"),
+            Map.entry("Cloud Computing", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088846/images_1_bk5lky.jpg"),
+            Map.entry("Cybersecurity", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745088965/istockphoto-1419462882-640x640_igq3b8.jpg"),
+            Map.entry("Blockchain", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089034/istockphoto-1227588477-640x640_uab02n.jpg"),
+            Map.entry("Internet of Things (IoT)", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089107/istockphoto-1184401187-612x612_vzyph7.jpg"),
+            Map.entry("Game Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089186/png-transparent-video-game-development-computer-icons-video-game-developer-design-thumbnail_wb01rh.png"),
+            Map.entry("Virtual Reality (VR) & Augmented Reality (AR)", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089287/p36new_hrpip9.jpg"),
+            Map.entry("Embedded Systems", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089348/images_2_ccbyqg.jpg"),
+            Map.entry("DevOps & Automation", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089400/istockphoto-1884505613-640x640_coxemq.jpg"),
+            Map.entry("Big Data & Analytics", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089454/png-clipart-big-data-data-analysis-data-science-analytics-bigdata-text-orange-thumbnail_xteqpi.png"),
+            Map.entry("Networking & Security", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089534/hp0f3siqf3_k3up3g.jpg"),
+            Map.entry("Software Engineering & Development", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089614/software-engineering-chart-with-keywords-and-icons-sketch-G2NGCM_rtthsw.jpg"),
+            Map.entry("Database Management", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089680/database-management-systems-dbms-software-600nw-2111606243_itg09q.webp"),
+            Map.entry("Computer Vision", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089734/gettyimages-2155079682-640x640_nulnki.jpg"),
+            Map.entry("Natural Language Processing (NLP)", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089786/cb3b2b7e5bfccd832005fb9537f76f132b241c3_foxota.jpg"),
+            Map.entry("Autonomous Systems", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089856/gettyimages-1431036626-640x640_e5i0cb.jpg"),
+            Map.entry("HealthTech", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089906/gettyimages-2160268764-640x640_f3mrm6.jpg"),
+            Map.entry("FinTech", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745089976/fintech-financial-technology-online-banking-and-crowdfunding-vector_x2bgwv.jpg"),
+            Map.entry("EdTech", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745090075/Ed-tech-Revolution_atx85e.jpg"),
+            Map.entry("Robotics", "https://res.cloudinary.com/dx7bcuxjn/image/upload/v1745090160/768-512-16792401-431-16792401-1667206541553_zueshf.jpg")
     );
 
 
@@ -226,6 +226,7 @@ public class ProjectService {
         applicant.getApplied().removeIf(application->application.equals(project.getId()));
         applicant.addTeamProject(project.getId());
         project.setFilled(project.getFilled()+1);
+        project.setTeamSize(Math.max(project.getTeamSize(),project.getFilled()+1));
         saveDirect(project);
         userService.saveDirect(applicant);
         notificationService.newApplicationforProjectNotification(applicant.getUserName(),project.getAuthor(),project.getTitle(),project.getId());

@@ -1,6 +1,7 @@
 package com.AntiSolo.AntiSolo.HelperEntities;
 
 public class WarningEntity {
+    private String reported;
     private String projectId;
     private String message;
     private String reportFrom;
@@ -9,6 +10,15 @@ public class WarningEntity {
         this.projectId = projectId;
         this.message = message;
         this.reportFrom = reportFrom;
+    }
+
+
+    public String getReported() {
+        return reported;
+    }
+
+    public void setReported(String reported) {
+        this.reported = reported;
     }
 
     public String getReportFrom() {
