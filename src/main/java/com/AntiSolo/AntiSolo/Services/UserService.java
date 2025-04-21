@@ -16,10 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -83,7 +80,14 @@ public class UserService {
                 ur.save(dbUser.get());
                 return dbUser.get().getUserName();
             }
-
+            List<User> admins = ur.findByRole("ADMIN");
+            List<Member> friendsForNewUser = new ArrayList<>();
+            for(User admin:admins){
+                friendsForNewUser.add(new Member(admin.getUserName(),admin.getProfileImageUrl()));
+                admin.getBuddies().add(new Member(user.getUserName(),user.getProfileImageUrl()));
+                saveDirect(admin);
+            }
+            user.setBuddies(friendsForNewUser);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User savedUser = ur.save(user);
 

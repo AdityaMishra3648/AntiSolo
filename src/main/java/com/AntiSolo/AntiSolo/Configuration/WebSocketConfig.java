@@ -1,5 +1,6 @@
 package com.AntiSolo.AntiSolo.Configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -14,6 +15,9 @@ import java.util.Arrays;
 @EnableWebSocketMessageBroker
 @CrossOrigin
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    @Value("${frontend.url}")
+    private String frontendurl;
+
 //    private final WebSocketAuthInterceptor webSocketAuthInterceptor;
 //
 //    public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor) {
@@ -61,17 +65,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/chat") // Endpoint for WebSocket connection
 //                .addInterceptors(new JwtHandshakeInterceptor())
                 .setAllowedOrigins(
-                        "http://127.0.0.1:5500",
-                        "http://localhost:3000",
-                        "http://localhost:5173",
-                        "http://your-domain.com",
-                        "https://your-secure-domain.com",
-                        "http://localhost:9000",
-                        "http://localhost:4200",
-                        "http://localhost:8080",
-                        "http://localhost:8081"
+                        frontendurl
+//                        "http://127.0.0.1:5500",
+//                        "http://localhost:3000",
+//                        "http://localhost:5173",
+//                        "http://your-domain.com",
+//                        "https://your-secure-domain.com",
+//                        "http://localhost:9000",
+//                        "http://localhost:4200",
+//                        "http://localhost:8080",
+//                        "http://localhost:8081"
                 )
-                .setAllowedOriginPatterns("*") // If your frontend uses dynamic subdomains
+//                .setAllowedOriginPatterns("*") // If your frontend uses dynamic subdomains
                 .withSockJS();
 
     }

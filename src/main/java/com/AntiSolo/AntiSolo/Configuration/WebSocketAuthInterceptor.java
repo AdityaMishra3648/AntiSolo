@@ -54,7 +54,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor  {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        System.out.println("websocket preSend called");
+//        System.out.println("websocket preSend called");
 
         String t = null;
         // Check if this is a CONNECT frame (initial WebSocket connection)
@@ -138,7 +138,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor  {
 //            }
 //            if(!user.get().getUserName().equals(users[0]) && !user.get().getUserName().equals(users[1]))throw new RuntimeException("Unauthorized User");
             boolean flag = !projectService.checkMember(user.get(),projectId);
-            System.out.println(projectId+" gave flag = "+flag);
+//            System.out.println(projectId+" gave flag = "+flag);
 //            for(Member buddy:user.get().getBuddies()){
 //                if(buddy.getName().equals(users[0]) || buddy.getName().equals(users[1]))flag = false;
 //            }
@@ -177,7 +177,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor  {
             String destination = accessor.getDestination();
             if(destination==null)throw new RuntimeException("Unauthorized subscription!");
             String[] users = extractUsernames(destination);
-            System.out.println(" user1 = "+users[0]+" user2 = "+users[1]);
+//            System.out.println(" user1 = "+users[0]+" user2 = "+users[1]);
             if(users.length!=2)throw new RuntimeException("Requires exactly two users");
 //            String expectedDestination = "/user/" + user.get().getUserName() + "/queue/private";
 

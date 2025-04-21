@@ -15,7 +15,7 @@ import java.util.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "user")
 public class User {

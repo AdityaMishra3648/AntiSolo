@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
+//@AllArgsConstructor
+//@NoArgsConstructor
 public class ProjectRequest {
     @NonNull
     public int teamSize;
@@ -27,6 +27,22 @@ public class ProjectRequest {
     public String status;
     public List<String> applicants;
     public List<String> members;
+
+    public ProjectRequest(int teamSize, int filled, String domain, List<String> tags, String author, String image, String title, String description, List<String> technologies, Date createdAt, String status, List<String> applicants, List<String> members) {
+        this.teamSize = teamSize;
+        this.filled = filled;
+        this.domain = domain;
+        this.tags = tags;
+        this.author = author;
+        this.image = image;
+        this.title = title;
+        this.description = description;
+        this.technologies = technologies;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.applicants = applicants;
+        this.members = members;
+    }
 
     public String getImage() {
         return image;

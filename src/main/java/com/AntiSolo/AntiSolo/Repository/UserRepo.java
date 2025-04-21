@@ -17,5 +17,7 @@ public interface UserRepo extends MongoRepository<User,String> {
     @Query("{ 'friendRequest.name': ?0 }")
     List<User> findAllByFriendRequestName(String userName);
 
+    List<User> findByRole(String role);
+
 
 }

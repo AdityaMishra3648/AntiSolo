@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/project")
-@CrossOrigin
+//@CrossOrigin
 public class ProjectController {
     @Autowired
     public ProjectService projectService;
@@ -64,7 +64,7 @@ public class ProjectController {
     }
 
     // Fetch random projects while excluding already fetched ones
-    @CrossOrigin(origins = "http://localhost:5174")
+//    @CrossOrigin(origins = "http://localhost:5174")
     @GetMapping("/randomPaginated")
     public ResponseEntity<List<Project>> getRandomProjects(
             @RequestParam(defaultValue = "10") int limit,

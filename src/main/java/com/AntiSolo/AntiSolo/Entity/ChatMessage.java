@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 
 @Document(collection = "Messages")
-@Getter
-@Setter
+//@Getter
+//@Setter
 public class ChatMessage {
     @Id
     ObjectId id;
