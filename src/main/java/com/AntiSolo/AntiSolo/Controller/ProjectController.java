@@ -7,21 +7,40 @@ import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.HelperEntities.WarningEntity;
 import com.AntiSolo.AntiSolo.Services.ProjectService;
 import com.AntiSolo.AntiSolo.Services.UserService;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.ConsumptionProbe;
+import io.github.bucket4j.Refill;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/project")
 //@CrossOrigin
 public class ProjectController {
+
+    private final Map<String, Bucket> postBuckets = new ConcurrentHashMap<>();
+
+    public Bucket resolvePostBucket(String userId) {
+        return postBuckets.computeIfAbsent(userId, id ->
+                Bucket.builder()
+                        .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(3))))
+                        .addLimit(Bandwidth.classic(3, Refill.intervally(3, Duration.ofDays(1))))
+                        .build()
+        );
+    }
+
     @Autowired
     public ProjectService projectService;
 
@@ -48,10 +67,17 @@ public class ProjectController {
 //        if(!loggedInUser.equals(projectRequest.getAuthor()))return "Invalid Request";
         // Remove "Bearer " prefix if present
 //        System.out.println("arrived in post");
+
         token = token.startsWith("Bearer ") ? token.substring(7) : token;
         projectRequest.setFilled(1);
         String username = jwtHelper.getUsernameFromToken(token);
+        Bucket bucket = resolvePostBucket(username); // Extracted from session/token/etc.
+        ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
+        if (!probe.isConsumed()) {
+            return "Rate limit exceeded. Try again later.";
+        }
         projectRequest.setAuthor(username);
+
         System.out.println("sending for project service");
         return projectService.save(projectRequest);
 //        return "working on the API";

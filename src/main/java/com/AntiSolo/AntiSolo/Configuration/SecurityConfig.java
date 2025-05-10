@@ -11,6 +11,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,12 +42,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http.csrf(csrf->csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http.csrf(AbstractHttpConfigurer::disable).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth->
                         auth.requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/signUp","/signUp/**","/login","/login/**","/project/getProject/**","/project/getProject"
                                 ,"/project/randomPaginated","/project/randomPaginated/**","/chat","/chat/**","/api/messages/**"
-                                        ,"/project/RandomPagesWithTags/**").permitAll()
+                                        ,"/project/RandomPagesWithTags/**","/test/hello").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntry))
@@ -85,6 +86,13 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
+        CorsConfiguration pingConfig = new CorsConfiguration();
+        pingConfig.setAllowedOrigins(List.of("*"));
+        pingConfig.setAllowedMethods(List.of("GET"));
+        pingConfig.setAllowedHeaders(List.of("*"));
+        source.registerCorsConfiguration("/test/hello",pingConfig);
+
         return source;
     }
 

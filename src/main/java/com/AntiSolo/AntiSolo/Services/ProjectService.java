@@ -144,6 +144,7 @@ public class ProjectService {
         Optional<User> user = userService.getById(projectRequest.getAuthor());
         if(!user.isPresent())return "Invalid Request!";
         if(projectRequest.getTeamSize()<=1)return "Team size can not be 0 or 1";
+        if(projectRequest.getTitle().contains("*") || projectRequest.getTitle().contains("$") || projectRequest.getTitle().contains(""+'"'))return "can not contain Special character";
         if(projectRequest.getDomain()==null || projectRequest.getDomain().isEmpty())return "Select Valid Domain!";
         if(!projectDomains.contains(projectRequest.getDomain()))return "Invalid domain name!";
         if(projectRequest.getTitle().trim().isEmpty())return "title can not be empty";

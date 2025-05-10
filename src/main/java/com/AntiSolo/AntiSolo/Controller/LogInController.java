@@ -4,6 +4,10 @@ import com.AntiSolo.AntiSolo.Configuration.JwtHelper;
 import com.AntiSolo.AntiSolo.Entity.User;
 import com.AntiSolo.AntiSolo.Services.UserDetailsServiceImpl;
 import com.AntiSolo.AntiSolo.Services.UserService;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.ConsumptionProbe;
+import io.github.bucket4j.Refill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +17,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.DoubleStream;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin
+//@CrossOrigin
 public class LogInController {
+
+//    private final Bucket postBucket = Bucket.builder()
+//            .addLimit(Bandwidth.classic(2, Refill.intervally(1, Duration.ofMinutes(1))))
+//            .build();
+
+
     @Autowired
     public UserService userService;
 
@@ -50,6 +62,11 @@ public class LogInController {
 
     @PostMapping
     public ResponseEntity<String> login(@RequestBody User user){
+
+//        ConsumptionProbe probe = postBucket.tryConsumeAndReturnRemaining(1);
+//        if (!probe.isConsumed()) {
+//            return new ResponseEntity<>("Rate limit exceeded. Please try again later.", HttpStatus.TOO_MANY_REQUESTS);
+//        }
 
         this.doAuthenticate(user.getUserName(),user.getPassword());
 
