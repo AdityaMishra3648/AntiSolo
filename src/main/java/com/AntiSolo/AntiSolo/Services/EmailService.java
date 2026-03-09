@@ -112,11 +112,12 @@ public class EmailService {
             </body>
             </html>
         """.formatted(otp);
+            System.out.println("message created for Otp");
 
             helper.setText(htmlContent, true);
 
             javaMailSender.send(message);
-
+            System.out.println("sent otp");
             otpService.generateAndSaveOTP(String.valueOf(otp), toEmail);
 
             return otp;
