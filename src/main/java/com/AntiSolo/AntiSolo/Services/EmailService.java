@@ -63,7 +63,7 @@ public class EmailService {
 
 
         SendEmailRequest request = SendEmailRequest.builder()
-                .from("AntiSolo <onboarding@resend.dev>")
+                .from("AntiSolo <support@antisolo.co.in>")
                 .to(toEmail)
                 .subject("⚠ Warning: Inappropriate Content in Your Project Opening Post on AntiSolo")
                 .html(htmlContent)
@@ -106,7 +106,7 @@ public class EmailService {
             """.formatted(userName);
 
         SendEmailRequest request = SendEmailRequest.builder()
-                .from("AntiSolo <onboarding@resend.dev>")
+                .from("AntiSolo <support@antisolo.co.in>")
                 .to(toEmail)
                 .subject("⚠ Warning: Inappropriate Content in Your Profile on AntiSolo")
                 .html(htmlContent)
@@ -151,7 +151,7 @@ public class EmailService {
         """.formatted(otp);
             System.out.println("message created for Otp");
             SendEmailRequest request = SendEmailRequest.builder()
-                    .from("AntiSolo <onboarding@resend.dev>")
+                    .from("AntiSolo <support@antisolo.co.in>")
                     .to(toEmail)
                     .subject("\uD83D\uDD10 Your AntiSolo Account Verification Code")
                     .html(htmlContent)
