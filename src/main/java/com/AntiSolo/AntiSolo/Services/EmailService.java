@@ -1,28 +1,47 @@
 package com.AntiSolo.AntiSolo.Services;
 
-import jakarta.mail.internet.MimeMessage;
+//import jakarta.mail.internet.MimeMessage;
+import com.resend.services.emails.model.SendEmailResponse;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+//import org.springframework.mail.SimpleMailMessage;
+//import org.springframework.mail.javamail.JavaMailSender;
+//import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import jakarta.mail.MessagingException;
+//import jakarta.mail.MessagingException;
+
+
+import com.resend.Resend;
+//import com.resend.services.emails.model.CreateEmailOptions;
+//import com.resend.services.emails.model.CreateEmailResponse;
+import com.resend.services.emails.model.SendEmailRequest;
 
 import java.util.Random;
 
 @Service
 public class EmailService {
-    @Autowired
-    private JavaMailSender javaMailSender;
+//    @Autowired
+//    private JavaMailSender javaMailSender;
     @Autowired
     private OTPService otpService;
 
+    @Value("${resend.api.key}")
+    private String apiKey;
+
+    private Resend resend;
+
+    @PostConstruct
+    public void init() {
+        resend = new Resend(apiKey);
+    }
+
     public void sendWarningEmail(String toEmail, String userName, String projectTitle) {
-        try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setTo(toEmail);
-            helper.setSubject("⚠️ Warning: Inappropriate Content in Your Project Opening Post on AntiSolo");
+//        try {
+//            MimeMessage message = javaMailSender.createMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+//            helper.setTo(toEmail);
+//            helper.setSubject("⚠️ Warning: Inappropriate Content in Your Project Opening Post on AntiSolo");
 
             String htmlContent = """
                 <html>
@@ -42,21 +61,30 @@ public class EmailService {
                 </html>
                 """.formatted(userName, projectTitle);
 
-            helper.setText(htmlContent, true); // "true" means it's HTML
 
-            javaMailSender.send(message);
+        SendEmailRequest request = SendEmailRequest.builder()
+                .from("AntiSolo <onboarding@resend.dev>")
+                .to(toEmail)
+                .subject("⚠ Warning: Inappropriate Content in Your Project Opening Post on AntiSolo")
+                .html(htmlContent)
+                .build();
 
-        } catch (MessagingException e) {
-            e.printStackTrace(); // Or handle error more gracefully
-        }
+        SendEmailResponse data = resend.emails().send(request);
+//            helper.setText(htmlContent, true); // "true" means it's HTML
+
+//            javaMailSender.send(message);
+
+//        } catch (MessagingException e) {
+//            e.printStackTrace(); // Or handle error more gracefully
+//        }
     }
 
     public void sendProfileWarningEmail(String toEmail, String userName) {
-        try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setTo(toEmail);
-            helper.setSubject("⚠️ Warning: Inappropriate Content in Your Profile on AntiSolo");
+//        try {
+//            MimeMessage message = javaMailSender.createMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+//            helper.setTo(toEmail);
+//            helper.setSubject("⚠️ Warning: Inappropriate Content in Your Profile on AntiSolo");
 
             String htmlContent = """
             <html>
@@ -77,11 +105,20 @@ public class EmailService {
             </html>
             """.formatted(userName);
 
-            helper.setText(htmlContent, true);
-            javaMailSender.send(message);
-        } catch (MessagingException e) {
-            e.printStackTrace(); // You can handle it better with logging
-        }
+        SendEmailRequest request = SendEmailRequest.builder()
+                .from("AntiSolo <onboarding@resend.dev>")
+                .to(toEmail)
+                .subject("⚠ Warning: Inappropriate Content in Your Profile on AntiSolo")
+                .html(htmlContent)
+                .build();
+
+        SendEmailResponse data = resend.emails().send(request);
+
+//            helper.setText(htmlContent, true);
+//            javaMailSender.send(message);
+//        } catch (MessagingException e) {
+//            e.printStackTrace(); // You can handle it better with logging
+//        }
     }
 
 
@@ -91,11 +128,11 @@ public class EmailService {
             int otp = 100000 + random.nextInt(900000); // Generates a number between
 
             // Prepare the email
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(toEmail);
-            helper.setSubject("🔐 Your AntiSolo Account Verification Code");
+//            MimeMessage message = javaMailSender.createMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+//
+//            helper.setTo(toEmail);
+//            helper.setSubject("🔐 Your AntiSolo Account Verification Code");
 
             String htmlContent = """
             <html>
@@ -113,40 +150,26 @@ public class EmailService {
             </html>
         """.formatted(otp);
             System.out.println("message created for Otp");
+            SendEmailRequest request = SendEmailRequest.builder()
+                    .from("AntiSolo <onboarding@resend.dev>")
+                    .to(toEmail)
+                    .subject("\uD83D\uDD10 Your AntiSolo Account Verification Code")
+                    .html(htmlContent)
+                    .build();
 
-            helper.setText(htmlContent, true);
+            SendEmailResponse data = resend.emails().send(request);
+//            helper.setText(htmlContent, true);
 
-            javaMailSender.send(message);
+//            javaMailSender.send(message);
             System.out.println("sent otp");
             otpService.generateAndSaveOTP(String.valueOf(otp), toEmail);
 
             return otp;
-
-
-//
-//            SimpleMailMessage mail = new SimpleMailMessage();
-//            mail.setTo(to);
-//            mail.setSubject("OTP from myapp is "+String.valueOf(randomNumber));
-//            mail.setText("Sample body for my message is the OTP "+String.valueOf(randomNumber));
-//            System.out.println("invalid mail sending 1 "+to+" body   = "+"Sample body for my message is the OTP "+String.valueOf(randomNumber));
-//
-//            javaMailSender.send(mail);
-//            otpService.generateAndSaveOTP(String.valueOf(randomNumber),to);
-//            return randomNumber;
-////            MimeMessage message = javaMailSender.createMimeMessage();
-////            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-////
-////            helper.setTo(to);
-////            helper.setSubject("OTP from app");
-////            helper.setText(body, true);
-////            helper.setFrom("your-email@gmail.com");
-//
-////            javaMailSender.send(message);
         }catch (Exception e){
             e.printStackTrace();
-//            throw new RuntimeException();
             return 0;
         }
+
 
     }
 
