@@ -15,7 +15,8 @@ RUN mvn clean package -DskipTests
 
 # Use a lightweight JDK image to run the app
 #FROM eclipse-temurin:17-jdk-alpine
-FROM openjdk:17-jdk-slim
+#FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 
 # Set the working directory
 WORKDIR /app

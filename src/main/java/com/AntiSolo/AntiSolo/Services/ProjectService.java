@@ -288,17 +288,17 @@ public class ProjectService {
 //        if(!projectDomains.contains(editedProject.getDomain()))return false;
         editedProject.setTeamSize(Math.max(editedProject.getTeamSize(),2));
 //        HashSet<String> tags = new HashSet<>();
-        System.out.println("...3");
+//        System.out.println("...3");
         for(String i:editedProject.getTags()){
             if(!technologyTags.contains(i))return false;
 //            tags.add(i);
         }
-        System.out.println("...4");
+//        System.out.println("...4");
         for(String s:editedProject.getTechnologies()){
             if(!TECHNOLOGIES.contains(s))return false;
         }
 
-        System.out.println("...5");
+//        System.out.println("...5");
         project.get().setStatus(editedProject.getStatus());
         project.get().setTeamSize(editedProject.getTeamSize());
         project.get().setDescription(editedProject.getDescription());
